@@ -1,0 +1,4 @@
+project_id  = "your-gcp-project-id"
+region      = "us-central1"
+github_repo = "minhazda/fraud-detection-mlops"
+image       = "us-central1-docker.pkg.dev/your-gcp-project-id/fraud-detection/api:bootstrap"
