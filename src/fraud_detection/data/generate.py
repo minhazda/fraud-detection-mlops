@@ -1,10 +1,11 @@
 """Deterministic synthetic card-transaction generator with labelled fraud.
 
-Produces an imbalanced dataset (~1-4% fraud) whose fraud probability is a
+Produces an imbalanced dataset (~5-6% fraud) whose fraud probability is a
 logistic function of real risk signals (night-time, risky merchant category,
 high amount vs the customer's personal average, foreign/far-from-home, new
-account, transaction velocity) plus noise -- so a model has genuine signal to
-learn without the labels being trivially separable.
+account, transaction velocity) plus Bernoulli noise. The signal is strong enough
+to be learnable (Bayes-optimal ROC-AUC ~0.93) without the labels being
+trivially separable.
 """
 
 from __future__ import annotations
@@ -46,17 +47,17 @@ def generate(n: int = 50_000, *, seed: int = 7) -> pd.DataFrame:
     night = ((hour < 5) | (hour >= 23)).astype(float)
     risky_cat = np.isin(merchant, ("gambling", "online")).astype(float)
     z = (
-        -5.2
-        + 0.9 * night
-        + 1.1 * risky_cat
-        + 0.6 * np.log1p(amount_ratio)
-        + 1.4 * is_foreign
-        + 0.015 * distance_from_home
-        + 0.5 * (account_age_days < 60).astype(float)
-        + 0.08 * np.maximum(n_tx_24h - 6, 0)
+        -7.5
+        + 1.8 * night
+        + 2.5 * risky_cat
+        + 1.5 * np.log1p(amount_ratio)
+        + 3.0 * is_foreign
+        + 0.03 * distance_from_home
+        + 1.5 * (account_age_days < 60).astype(float)
+        + 0.20 * np.maximum(n_tx_24h - 6, 0)
     )
     prob = 1.0 / (1.0 + np.exp(-z))
-    is_fraud = rng.binomial(1, np.clip(prob, 0.0, 0.95))
+    is_fraud = rng.binomial(1, np.clip(prob, 0.0, 0.97))
 
     return pd.DataFrame(
         {
