@@ -3,6 +3,7 @@
 Loads the persisted ``{model, features, threshold}`` bundle on startup and
 exposes:
 
+* ``GET  /``         -- interactive demo UI;
 * ``GET  /health``   -- liveness/readiness probe;
 * ``GET  /metadata`` -- feature schema + operating threshold;
 * ``POST /predict``  -- score raw transactions (features engineered server-side);
@@ -20,10 +21,12 @@ from typing import Any
 import joblib
 import pandas as pd
 from fastapi import FastAPI, HTTPException, status
-from fastapi.responses import RedirectResponse
+from fastapi.responses import HTMLResponse
 from prometheus_client import Counter, Histogram
 from prometheus_fastapi_instrumentator import Instrumentator
 from pydantic import BaseModel, Field
+
+from .ui import INDEX_HTML
 
 MODEL_PATH = Path(os.environ.get("FD_MODEL_PATH", "models/fraud_model.joblib"))
 _STATE: dict[str, Any] = {"model": None, "features": [], "threshold": 0.5}
@@ -65,9 +68,9 @@ class ScoreRequest(BaseModel):
     rows: list[dict[str, Any]] = Field(..., min_length=1, description="Raw transactions.")
 
 
-@app.get("/", include_in_schema=False)
-def root() -> RedirectResponse:
-    return RedirectResponse(url="/docs")
+@app.get("/", include_in_schema=False, response_class=HTMLResponse)
+def root() -> str:
+    return INDEX_HTML
 
 
 @app.get("/health")
