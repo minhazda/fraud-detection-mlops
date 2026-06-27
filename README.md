@@ -8,12 +8,14 @@ forecasting) to show breadth.
 
 > **Author:** Md Minhazur Rahman · MSc Data Science, University of Greenwich
 
-## 🔴 Live API (GCP Cloud Run)
+## 🔴 Live demo (GCP Cloud Run)
 
-**https://fraud-detection-api-ude5vos6lq-uc.a.run.app** — deployed from the
-Terraform IaC in [`terraform/`](terraform/) (Cloud Run scales to zero, Artifact
-Registry, keyless GitHub→GCP Workload Identity Federation). Endpoints:
-`/health`, `/metadata`, `/predict`, `/metrics`.
+**▶ Open https://fraud-detection-api-ude5vos6lq-uc.a.run.app/ in a browser** for an
+interactive UI: enter a transaction (or use a preset) and get a fraud-probability
+score, a decision against the tuned threshold, and the **risk signals that drove
+it**. (Scales to zero — the first request after idle takes ~10s to wake.)
+
+API endpoints: `/` (demo) · `/predict` · `/metadata` · `/health` · `/metrics` · `/docs`.
 
 ```bash
 curl -X POST "https://fraud-detection-api-ude5vos6lq-uc.a.run.app/predict" \
@@ -25,6 +27,26 @@ curl -X POST "https://fraud-detection-api-ude5vos6lq-uc.a.run.app/predict" \
   }]
 }'
 # -> {"fraud_probability":[0.999],"is_fraud":[true],"threshold":0.715}
+```
+
+## Architecture
+
+```mermaid
+flowchart LR
+    subgraph Train["Training (build time)"]
+        GEN["Synthetic txn generator<br/>risk-driven, imbalanced"]
+        FE["Leakage-safe features<br/>(shared train/serve)"]
+        LGBM["LightGBM + scale_pos_weight<br/>3-way split; threshold on val"]
+        GEN --> FE --> LGBM --> ART[("Model bundle<br/>model · features · threshold")]
+    end
+    subgraph Serve["Serving (Cloud Run, scales to zero)"]
+        UI["Interactive demo /"] --> API["FastAPI /predict<br/>raw txn -> features -> score"]
+        ART --> API
+        API --> PROM["/metrics (Prometheus)"]
+    end
+    CI["GitHub Actions<br/>ruff·black·mypy·pytest"] -. builds .-> IMG["Docker image"]
+    TF["Terraform + WIF"] -. provisions .-> Serve
+    IMG -. deploys .-> Serve
 ```
 
 ## Why this project
