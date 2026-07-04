@@ -102,9 +102,7 @@ def predict(req: ScoreRequest) -> dict[str, Any]:
     try:
         engineered = build_features(pd.DataFrame(req.rows))
     except KeyError as exc:
-        raise HTTPException(
-            status.HTTP_422_UNPROCESSABLE_ENTITY, f"Missing field: {exc}"
-        ) from exc
+        raise HTTPException(status.HTTP_422_UNPROCESSABLE_ENTITY, f"Missing field: {exc}") from exc
     matrix = engineered.reindex(columns=features, fill_value=0)
 
     probabilities = model.predict_proba(matrix)[:, 1]

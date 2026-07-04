@@ -5,6 +5,7 @@ from __future__ import annotations
 import os
 from dataclasses import dataclass
 from pathlib import Path
+from typing import Any
 
 import yaml
 
@@ -19,8 +20,10 @@ class Settings:
 
 def load(path: str | Path | None = None) -> Settings:
     """Load settings from YAML (FD_CONFIG), with FD_MODEL_PATH override."""
-    cfg_path = Path(path or os.environ.get("FD_CONFIG", "configs/config.yaml"))
-    data: dict[str, object] = {}
+    if path is None:
+        path = os.environ.get("FD_CONFIG", "configs/config.yaml")
+    cfg_path = Path(path)
+    data: dict[str, Any] = {}
     if cfg_path.is_file():
         data = yaml.safe_load(cfg_path.read_text(encoding="utf-8")) or {}
     model_path = os.environ.get(
