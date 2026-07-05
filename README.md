@@ -15,6 +15,8 @@ interactive UI: enter a transaction (or use a preset) and get a fraud-probabilit
 score, a decision against the tuned threshold, and the **risk signals that drove
 it**. (Scales to zero — the first request after idle takes ~10s to wake.)
 
+![Live demo — a risky transaction scored 99.9%, flagged against the 71.5% tuned threshold, with the key risk signals listed](docs/demo.png)
+
 API endpoints: `/` (demo) · `/predict` · `/metadata` · `/health` · `/metrics` · `/docs`.
 
 ```bash
