@@ -5,6 +5,13 @@ INDEX_HTML = """<!doctype html>
 <meta name='viewport' content='width=device-width,initial-scale=1'>
 <link rel='icon' href='data:,'>
 <title>Card Fraud Detection - Live Demo</title>
+<meta name='description' content='LightGBM scores a card transaction for fraud risk in real time - ROC-AUC 0.90, PR-AUC 0.49 (~8x base rate). Deployed on GCP Cloud Run via Terraform.'>
+<meta property='og:type' content='website'>
+<meta property='og:title' content='Card Fraud Detection - Live ML Demo'>
+<meta property='og:description' content='Enter a transaction, get a real-time fraud-risk score with the signals that drove it. LightGBM - ROC-AUC 0.90 - PR-AUC 0.49 (~8x base rate) - GCP Cloud Run.'>
+<meta property='og:url' content='https://fraud-detection-api-ude5vos6lq-uc.a.run.app/'>
+<meta property='og:image' content='https://raw.githubusercontent.com/minhazda/fraud-detection-mlops/main/docs/demo.png'>
+<meta name='twitter:card' content='summary_large_image'>
 <style>
 :root{--card:#1e293b;--muted:#94a3b8;--line:#334155;--accent:#38bdf8}
 *{box-sizing:border-box}body{margin:0;font-family:system-ui,Segoe UI,Roboto,sans-serif;background:linear-gradient(160deg,#0b1220,#0f172a);color:#e2e8f0;min-height:100vh}
