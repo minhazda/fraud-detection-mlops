@@ -44,9 +44,17 @@ def evaluate(y_true: Sequence[int], y_prob: Sequence[float], threshold: float) -
         y_true_arr, y_pred, average="binary", zero_division=0
     )
     tn, fp, fn, tp = confusion_matrix(y_true_arr, y_pred, labels=[0, 1]).ravel()
+    # A batch with no fraud at all (a quiet day) has only one class in y_true.
+    # ROC-AUC is undefined there; some sklearn versions raise instead of warning.
+    if len(np.unique(y_true_arr)) < 2:
+        roc_auc = float("nan")
+        pr_auc = float("nan")
+    else:
+        roc_auc = float(roc_auc_score(y_true_arr, y_prob_arr))
+        pr_auc = float(average_precision_score(y_true_arr, y_prob_arr))
     return ClassMetrics(
-        roc_auc=float(roc_auc_score(y_true_arr, y_prob_arr)),
-        pr_auc=float(average_precision_score(y_true_arr, y_prob_arr)),
+        roc_auc=roc_auc,
+        pr_auc=pr_auc,
         precision=float(precision),
         recall=float(recall),
         f1=float(f1),
