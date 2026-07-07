@@ -63,7 +63,8 @@ def test_higher_threshold_never_flags_more_transactions() -> None:
     y = rng.integers(0, 2, 500)
     p = rng.random(500)
 
-    flagged_counts = [evaluate(y, p, t).tp + evaluate(y, p, t).fp for t in (0.1, 0.3, 0.5, 0.7, 0.9)]
+    thresholds = (0.1, 0.3, 0.5, 0.7, 0.9)
+    flagged_counts = [evaluate(y, p, t).tp + evaluate(y, p, t).fp for t in thresholds]
     assert flagged_counts == sorted(flagged_counts, reverse=True)
 
 
